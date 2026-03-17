@@ -16,10 +16,21 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define MAX_DISTANCE 400
 #define MIN_DISTANCE 2
 
+#define BLUE_PIN 3
+#define GREEN_PIN 5
+#define RED_PIN 6
+
+#define CLOSE_DISTANCE 2
+#define FAR_DISTANCE 30
+
 void setup() {
   Serial.begin(9600);
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
+
+  pinMode(RED_PIN, OUTPUT);
+  pinMode(GREEN_PIN, OUTPUT);
+  pinMode(BLUE_PIN, OUTPUT);
 
   if( !display.begin(SSD1306_SWITCHCAPVCC, 0x3C)){
     Serial.println("OLED not Found! Check Wiring.");
@@ -35,6 +46,12 @@ void setup() {
   delay(2000);
 
   Serial.println("Distance meter Starting...");
+}
+
+void setLED(bool r, bool g, bool b){
+  digitalWrite(RED_PIN, r);
+  digitalWrite(GREEN_PIN, g);
+  digitalWrite(BLUE_PIN, b);
 }
 
 float readDistance(){
@@ -76,6 +93,19 @@ void displayDistance(float distance){
   display.display();
 }
 
+void updateLED(float distance){
+  if(distance < CLOSE_DISTANCE){
+    setLED(true, false, false);
+    Serial.println("LED: RED");
+  } else if(distance > FAR_DISTANCE){
+    setLED(false, false, true);
+    Serial.println("LED: BLUE");
+  } else{
+    setLED(false, true, false);
+    Serial.println("LED: GREEN");
+  }
+}
+
 void loop() {
   float distance = readDistance();
   
@@ -84,6 +114,8 @@ void loop() {
   Serial.println(" cm");
 
   displayDistance(distance);
+  updateLED(distance);
+  
   delay(300);
 }
  
