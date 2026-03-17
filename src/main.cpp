@@ -48,10 +48,10 @@ void setup() {
   Serial.println("Distance meter Starting...");
 }
 
-void setLED(bool r, bool g, bool b){
-  digitalWrite(RED_PIN, r);
-  digitalWrite(GREEN_PIN, g);
-  digitalWrite(BLUE_PIN, b);
+void setLED(int r, int g, int b){
+  analogWrite(RED_PIN, r);
+  analogWrite(GREEN_PIN, g);
+  analogWrite(BLUE_PIN, b);
 }
 
 float readDistance(){
@@ -95,13 +95,14 @@ void displayDistance(float distance){
 
 void updateLED(float distance){
   if(distance < CLOSE_DISTANCE){
-    setLED(true, false, false);
+    int brightness = map(distance, 0, CLOSE_DISTANCE, 255, 50);
+    setLED(brightness, 0, 0);
     Serial.println("LED: RED");
   } else if(distance > FAR_DISTANCE){
-    setLED(false, false, true);
+    setLED(0, 0, 255);
     Serial.println("LED: BLUE");
   } else{
-    setLED(false, true, false);
+    setLED(0, 255, 0);
     Serial.println("LED: GREEN");
   }
 }
